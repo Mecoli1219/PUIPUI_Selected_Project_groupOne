@@ -17,7 +17,7 @@ def main():
     interf = interface.interface()
     point = score.Scoreboard("data/UID.csv", "換隊員啦")
     # TODO : Initializ1e necessary variables
-
+    # WTF
     if (sys.argv[1] == '0'):
         print("Mode 0: for treasure-hunting")
         direction = "2"  # input("Enter the initial direction:(1,2,3,4)")
