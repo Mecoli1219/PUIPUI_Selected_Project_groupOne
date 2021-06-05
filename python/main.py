@@ -35,20 +35,20 @@ def main():
             cv.waitKey(1)
 
     elif (sys.argv[1] == '1'):
-        img = cv.imread("./b.jpg")
-        img_hsv = cv.cvtColor(img, cv.COLOR_BGR2HSV)
-        mask_red1 = cv.inRange(img_hsv,(0,50,20),(5,255,255))
-        mask_red2 = cv.inRange(img_hsv,(175,50,20),(180,255,255))
-        mask_blue = cv.inRange(img_hsv,(110,50,50),(130,255,255))
-        mask_green = cv.inRange(img_hsv,(40,40,40),(70,255,255))
-        mask_red = cv.bitwise_or(mask_red1, mask_red2)
-        croped_red = cv.bitwise_and(img,img, mask = mask_red)
-        croped_blue = cv.bitwise_and(img,img, mask = mask_blue)
-        croped_green = cv.bitwise_and(img,img, mask = mask_green)
-        print(img.shape)
-        cv.imshow("red", croped_red)
-        cv.imshow("blue", croped_blue)
-        cv.imshow("green", croped_green)
+        test = cv.imread("./src/test.jpg")
+        #img = cv.cvtColor(test, cv.COLOR_BGR2GRAY)
+        #canny = cv.Canny(img, 50,100)
+        #circles = cv.HoughCircles(img, cv.HOUGH_GRADIENT, 2, 100, param1 = 100, param2 = 100, minRadius = 0, maxRadius = 500)
+        #print(circles)
+        #for i in circles[0,:]:
+        #    cv.circle(test, (i[0],i[1]),int(i[2]),(0,255,0),2)
+        #    cv.circle(test, (i[0],i[1]),2,(0,0,255),3)
+        circle = pic.find_blue_circle(test)
+        try:
+            cv.circle(test,(circle[0],circle[1]),5,(0,0,255),3)
+        except:
+            print("not found")
+        cv.imshow("circle", test)
         cv.waitKey()
 
 
