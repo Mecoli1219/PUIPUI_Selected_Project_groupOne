@@ -16,21 +16,21 @@ def take_pic(camera, rawCapture, Time = 1):
 
 def show_red(image):
     img_hsv = cv.cvtColor(image, cv.COLOR_BGR2HSV)
-    mask1 = cv.inRange(img_hsv,(0,150,50),(15,255,255))
-    mask2 = cv.inRange(img_hsv,(165,150,50), (180,255,255))
+    mask1 = cv.inRange(img_hsv,(0,150,150),(15,255,255))
+    mask2 = cv.inRange(img_hsv,(165,150,150), (180,255,255))
     mask = cv.bitwise_or(mask1, mask2)
     cropped = cv.bitwise_and(image, image, mask = mask)
     return cropped
     
 def show_blue(image):
     img_hsv = cv.cvtColor(image, cv.COLOR_BGR2HSV)
-    mask = cv.inRange(img_hsv,(90,100,50),(140,255,255))
+    mask = cv.inRange(img_hsv,(90,100,150),(140,255,255))
     cropped = cv.bitwise_and(image, image, mask = mask)
     return cropped
     
 def show_green(image):
     img_hsv = cv.cvtColor(image, cv.COLOR_BGR2HSV)
-    mask = cv.inRange(img_hsv,(40,100,40),(80,255,255))
+    mask = cv.inRange(img_hsv,(40,100,140),(80,255,255))
     cropped = cv.bitwise_and(image, image, mask = mask)
     return cropped
 
@@ -41,20 +41,29 @@ def find_circle(image):
 
 def mask_red(image):
     img_hsv = cv.cvtColor(image, cv.COLOR_BGR2HSV)
-    mask1 = cv.inRange(img_hsv,(0,150,50),(15,255,255))
-    mask2 = cv.inRange(img_hsv,(165,150,50), (180,255,255))
+    mask1 = cv.inRange(img_hsv,(0,150,150),(15,255,255))
+    mask2 = cv.inRange(img_hsv,(165,150,150), (180,255,255))
     mask = cv.bitwise_or(mask1, mask2)
     return mask
 
 def mask_blue(image):
     img_hsv = cv.cvtColor(image, cv.COLOR_BGR2HSV)
-    mask = cv.inRange(img_hsv,(90,100,50),(140,255,255))
+    mask = cv.inRange(img_hsv,(90,100,150),(140,255,255))
     return mask
     
 def mask_green(image):
     img_hsv = cv.cvtColor(image, cv.COLOR_BGR2HSV)
-    mask = cv.inRange(img_hsv,(40,100,40),(80,255,255))
+    mask = cv.inRange(img_hsv,(40,100,140),(80,255,255))
     return mask
+
+def mask_color(image, color):
+    if color == "red":
+        return mask_red(image)
+    if color == "blue":
+        return mask_blue(image)
+    if color == "green":
+        return mask_green(image)
+
 
 def rec_out_circle(circle, image):
     x1 = int(circle[1] - circle[2])
@@ -70,6 +79,28 @@ def rec_out_circle(circle, image):
     if y2 > image.shape[0]:
         y2 = image.shape[0]
     return x1,x2,y1,y2
+
+def find_color_circle(image, color):
+    circles = find_circle(image)
+    try:
+        for circle in circles[0]:    
+            mask = np.zeros(image.shape[:2], np.uint8)
+            x1,x2,y1,y2 = rec_out_circle(circle,image)
+            mask[x1:x2,y1:y2] = 255
+            masked = cv.bitwise_and(image, image, mask = mask)
+            if color == "red":
+                color_mask = mask_red(masked)
+            if color == "blue":
+                color_mask = mask_blue(masked)
+            if color == "green":
+                color_mask = mask_green(masked)
+
+            if color_mask.sum() >= 255 * 0.4 * circle[2] ** 2:
+                return circle
+        return None
+    except:
+        return None
+
 
 def find_red_circle(image):
     circles = find_circle(image)
@@ -136,9 +167,9 @@ def direct(mask, threshold = 50, size = 2500):
 
 def detect_object(image, color_dict, threshold = 50, size = 2500):
     circle = list()
-    circle.append(find_red_circle(image))
-    circle.append(find_blue_circle(image))
-    circle.append(find_green_circle(image))
+    circle.append(find_color_circle(image, "red"))
+    circle.append(find_color_circle(image, "blue"))
+    circle.append(find_color_circle(image, "green"))
     mask = 255 * np.ones(image.shape[:2], np.uint8)
     masked = image
     for index in range(3):
@@ -164,21 +195,50 @@ def detect_object(image, color_dict, threshold = 50, size = 2500):
     if red_num >= blue_num and red_num >= green_num and red_num != -1:
         next_color = None
         direction, target = direct(red_mask, threshold, size)
-        if direction == "straight":
+        if target:
             next_color = "red"
         return next_color, direction, target
     if blue_num >= red_num and blue_num >= green_num and blue_num != -1:
         next_color = None
         direction, target = direct(blue_mask, threshold, size)
-        if direction == "straight":
+        if target:
             next_color = "blue"
         return next_color, direction, target
     if green_num >= blue_num and green_num >= red_num and green_num != -1:
         next_color = None
         direction, target = direct(green_mask, threshold, size)
-        if direction == "straight":
+        if target:
             next_color = "green"
         return next_color, direction, target
     return None, "right", False
+
+def track_object(image, color, threshold = 50):
+    circle = find_color_circle(image, color)
+    mask = 255 * np.ones(image.shape[:2], np.uint8)
+    masked = image
+    if circle is not None:
+        x1, x2, y1, y2 = rec_out_circle(circle, image)
+        mask[x1:x2,y1:y2] = 0
+        masked = cv.bitwise_and(masked, masked, mask = mask)
+    color_mask = mask_color(masked, color)
+    direction, target = direct(color_mask, threshold, 1000)
+    return direction
+
+def detect_storage(image, color, threshold = 20, radius = 100):
+    circle = find_color_circle(image, color)
+    half_len = image.shape[1] // 2
+    if circle is not None:
+        arrive = False
+        if circle[0] - half_len > threshold:
+            direction = "right"
+        elif half_len - circle[0] > threshold:
+            direction = "left"
+        else:
+            direction = "straight"
+            if circle[2] >= radius:
+                arrive = True
+        return direction, arrive
+    return  "right", False
+    
 
 
