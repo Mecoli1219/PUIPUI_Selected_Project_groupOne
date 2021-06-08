@@ -25,7 +25,6 @@ void setup() {
   pinMode(MotorL_PWML, OUTPUT);
   pinMode(MotorR_PWMR, OUTPUT);
   myservo.attach(Servo_signal);
-
 #ifdef DEBUG
   Serial.println("Start!");
 #endif
@@ -33,22 +32,37 @@ void setup() {
 }
 
 
-int _Tp = 180;
+int _Tp = 180;   
 
 void loop() {
 
     if(Serial.available() > 0) {
-    String data = Serial.readStringUntil('\n');
-    Serial.print("You sent me: ");
-    Serial.println(data);
+      String data = Serial.readStringUntil('\n');
+      //Serial.print("You sent me: ");
+      //Serial.println(data);
+      
+      if(data == "straight"){
+        move_forward(200,200);              
+      }
+      else if(data == "left"){
+        turn_left(200,200);
+      }
+      else if(data == "right"){
+        turn_right(200,200);
+      }
+      else if(data == "catch"){
+        catchbox();
+      }
+      else if(data == "drop"){
+        drop();
+      }
+    }
 
-    
 
+  
 }
 
-  /*if(data=="L"){
-    
-    }*/
+
 
 //catch drop
 //drop 完要後退 後退完要U turn

@@ -7,6 +7,7 @@ int extern MotorR_I3;
 int extern MotorR_I4;
 int extern MotorL_PWML;
 int extern MotorR_PWMR;
+Servo extern myservo;
 
 void move_forward(double vL, double vR){
   digitalWrite(MotorL_I1, HIGH);
@@ -16,7 +17,6 @@ void move_forward(double vL, double vR){
   analogWrite(MotorL_PWML,vL);
   analogWrite(MotorR_PWMR,vR);
 }
-
 
 void move_backward(double vL, double vR){
   digitalWrite(MotorL_I2, HIGH);
@@ -44,7 +44,8 @@ void turn_right(double vL, double vR){
   analogWrite(MotorL_PWML,vL);
   analogWrite(MotorR_PWMR,vR);  
 }
-void catch(){
+
+void catchbox(){
   myservo.write(90);
   delay(2000);
 }
@@ -53,12 +54,11 @@ void drop(){
   delay(2000);
 }
 
+
 void stop_car(){
   digitalWrite(MotorL_I1, LOW);
   digitalWrite(MotorL_I2, LOW);
   digitalWrite(MotorR_I3, LOW);
   digitalWrite(MotorR_I4, LOW);
-//  analogWrite(MotorL_PWML,vL);
-//  analogWrite(MotorR_PWMR,vR);
 }
   
