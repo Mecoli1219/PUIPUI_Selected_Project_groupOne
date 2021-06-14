@@ -11,6 +11,11 @@ int MotorR_I4 = 7;   //定義 I4 接腳（右）
 int MotorL_PWML = 6; //定義 ENA (PWM調速) 接腳
 int MotorR_PWMR = 5; //定義 ENB (PWM調速) 接腳
 int Servo_signal = 9;
+String straight_s = "straight";
+String left_s = "left";
+String right_s = "right";
+String catch_s = "catch";
+String drop_s = "drop";
 
 Servo myservo;
 
@@ -42,19 +47,19 @@ void loop() {
       //Serial.print("You sent me: ");
       //Serial.println(data);
       
-      if(data == "straight"){
+      if(data == straight_s){
         move_forward(200,200);              
       }
-      else if(data == "left"){
+      else if(data == left_s){
         turn_left(200,200);
       }
-      else if(data == "right"){
+      else if(data == right_s){
         turn_right(200,200);
       }
-      else if(data == "catch"){
+      else if(data == catch_s){
         catchbox();
       }
-      else if(data == "drop"){
+      else if(data == drop_s){
         drop();
       }
     }

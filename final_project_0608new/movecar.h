@@ -56,9 +56,8 @@ void drop(){
 
 
 void stop_car(){
-  digitalWrite(MotorL_I1, LOW);
-  digitalWrite(MotorL_I2, LOW);
-  digitalWrite(MotorR_I3, LOW);
-  digitalWrite(MotorR_I4, LOW);
+  digitalWrite(MotorL_PWML, LOW);
+  digitalWrite(MotorR_PWMR, LOW);
+
 }
   
