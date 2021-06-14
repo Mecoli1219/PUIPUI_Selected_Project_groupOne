@@ -25,6 +25,7 @@ void setup() {
   pinMode(MotorL_PWML, OUTPUT);
   pinMode(MotorR_PWMR, OUTPUT);
   myservo.attach(Servo_signal);
+  myservo.write(60);
 #ifdef DEBUG
   Serial.println("Start!");
 #endif
@@ -57,9 +58,26 @@ void loop() {
         drop();
       }
     }
-
-
-  
+/*
+  move_forward(200,200);
+  delay(500);
+  stop_car();
+  catchbox();
+  move_forward(200,200);
+  delay(500);
+  turn_left(200,200);
+  delay(2000);
+  move_forward(200,200);
+  delay(500);
+  stop_car();
+  drop();
+  move_backward(200,200);
+  delay(500);
+  turn_right(200,200);
+  delay(500);
+  stop_car();
+  delay(5000000);
+  */
 }
 
 

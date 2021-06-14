@@ -46,11 +46,11 @@ void turn_right(double vL, double vR){
 }
 
 void catchbox(){
-  myservo.write(90);
+  myservo.write(0);
   delay(2000);
 }
 void drop(){
-  myservo.write(0);
+  myservo.write(60);
   delay(2000);
 }
 
