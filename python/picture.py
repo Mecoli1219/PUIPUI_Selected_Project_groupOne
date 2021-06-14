@@ -30,13 +30,19 @@ def show_blue(image):
     
 def show_green(image):
     img_hsv = cv.cvtColor(image, cv.COLOR_BGR2HSV)
-    mask = cv.inRange(img_hsv,(40,100,180),(80,255,255))
+    mask = cv.inRange(img_hsv,(25,100,100),(40,255,255))
     cropped = cv.bitwise_and(image, image, mask = mask)
     return cropped
 
-def find_circle(image):
+def find_circle(image, color):
+    if color == "red":
+        parameter2 = 100
+    if color == "blue":
+        parameter2 = 120
+    if color == "green":
+        parameter2 = 110
     img = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-    circles = cv.HoughCircles(img, cv.HOUGH_GRADIENT, 5, 100, param1 = 800, param2 = 130, minRadius = 10, maxRadius = 400) # change param2
+    circles = cv.HoughCircles(img, cv.HOUGH_GRADIENT, 5, 100, param1 = 800, param2 = parameter2, minRadius = 10, maxRadius = 400) # change param2
     return circles    
 
 def mask_red(image):
@@ -53,7 +59,7 @@ def mask_blue(image):
     
 def mask_green(image):
     img_hsv = cv.cvtColor(image, cv.COLOR_BGR2HSV)
-    mask = cv.inRange(img_hsv,(40,100,180),(80,255,255))
+    mask = cv.inRange(img_hsv,(25,100,100),(40,255,255))
     return mask
 
 def mask_color(image, color):
@@ -63,6 +69,14 @@ def mask_color(image, color):
         return mask_blue(image)
     if color == "green":
         return mask_green(image)
+
+def circle_mask(image, circle):
+    mask = np.zeros(image.shape[:2], np.uint8)
+    for x in range(image.shape[0]):
+        for y in range(image.shape[1]):
+            if (x-circle[0])**2 + (y-circle[1])**2 - circle[2]**2 <= 0:
+                mask[y][x] = 255
+    return mask
 
 
 def rec_out_circle(circle, image):
@@ -81,12 +95,15 @@ def rec_out_circle(circle, image):
     return x1,x2,y1,y2
 
 def find_color_circle(image, color):
-    circles = find_circle(image)
+    circles = find_circle(image, color)
     try:
         for circle in circles[0]:    
+            mask = circle_mask(image, circle)
+            '''
             mask = np.zeros(image.shape[:2], np.uint8)
             x1,x2,y1,y2 = rec_out_circle(circle,image)
             mask[x1:x2,y1:y2] = 255
+            '''
             masked = cv.bitwise_and(image, image, mask = mask)
             if color == "red":
                 color_mask = mask_red(masked)
@@ -95,7 +112,7 @@ def find_color_circle(image, color):
             if color == "green":
                 color_mask = mask_green(masked)
 
-            if color_mask.sum() >= 255 * 0.4 * circle[2] ** 2:
+            if color_mask.sum() >= 255 * 0.7 * circle[2] ** 2:
                 return circle
         return None
     except:
@@ -103,45 +120,39 @@ def find_color_circle(image, color):
 
 
 def find_red_circle(image):
-    circles = find_circle(image)
+    circles = find_circle(image, "red")
     try:
         for circle in circles[0]:    
-            mask = np.zeros(image.shape[:2], np.uint8)
-            x1,x2,y1,y2 = rec_out_circle(circle,image)
-            mask[x1:x2,y1:y2] = 255
+            mask = circle_mask(image, circle)
             masked = cv.bitwise_and(image, image, mask = mask)
             red_mask = mask_red(masked)
-            if red_mask.sum() >= 255 * 0.4 * circle[2] ** 2:
+            if red_mask.sum() >= 255 * 0.7 * circle[2] ** 2:
                 return circle
         return None
     except:
         return None
 
 def find_blue_circle(image):
-    circles = find_circle(image)
+    circles = find_circle(image, "blue")
     try:
         for circle in circles[0]:    
-            mask = np.zeros(image.shape[:2], np.uint8)
-            x1,x2,y1,y2 = rec_out_circle(circle,image)
-            mask[x1:x2,y1:y2] = 255
+            mask = circle_mask(image, circle)
             masked = cv.bitwise_and(image, image, mask = mask)
             blue_mask = mask_blue(masked)
-            if blue_mask.sum() >= 255 * 0.4 * circle[2] ** 2:
+            if blue_mask.sum() >= 255 * 0.7 * circle[2] ** 2:
                 return circle
         return None
     except:
         return None
 
 def find_green_circle(image):
-    circles = find_circle(image)
+    circles = find_circle(image, "green")
     try:
         for circle in circles[0]:    
-            mask = np.zeros(image.shape[:2], np.uint8)
-            x1,x2,y1,y2 = rec_out_circle(circle, image)
-            mask[x1:x2,y1:y2] = 255
+            mask = circle_mask(image, circle)
             masked = cv.bitwise_and(image, image, mask = mask)
             green_mask = mask_green(masked)
-            if green_mask.sum() >= 255 * 0.4 * circle[2] ** 2:
+            if green_mask.sum() >= 255 * 0.7 * circle[2] ** 2:
                 return circle
         return None
     except:
@@ -229,6 +240,7 @@ def track_object(image, color, threshold = 50):
 
 def detect_storage(image, color, threshold = 20, radius = 100):
     circle = find_color_circle(image, color)
+    print("circle")
     half_len = image.shape[1] // 2
     if circle is not None:
         arrive = False

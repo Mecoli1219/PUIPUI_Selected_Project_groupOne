@@ -87,8 +87,8 @@ def main():
     elif (sys.argv[1] == '1'):
         while True:
             image = pic.take_pic(camera, rawCapture, 0.1)
-            circles = (pic.find_circle(pic.show_blue(image[:,:,::-1])))
-            img = pic.show_blue(image[:,:,::-1])
+            circles = (pic.find_circle(pic.show_red(image[:,:,::-1]),"red"))
+            img = pic.show_red(image[:,:,::-1])
             print(circles)
             canny = cv.Canny(img, 400, 800)
             if circles is not None:
