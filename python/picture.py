@@ -16,44 +16,44 @@ def take_pic(camera, rawCapture, Time = 1):
 
 def show_red(image):
     img_hsv = cv.cvtColor(image, cv.COLOR_BGR2HSV)
-    mask1 = cv.inRange(img_hsv,(0,150,150),(15,255,255))
-    mask2 = cv.inRange(img_hsv,(165,150,150), (180,255,255))
+    mask1 = cv.inRange(img_hsv,(0,150,130),(15,255,255))
+    mask2 = cv.inRange(img_hsv,(165,150,130), (180,255,255))
     mask = cv.bitwise_or(mask1, mask2)
     cropped = cv.bitwise_and(image, image, mask = mask)
     return cropped
     
 def show_blue(image):
     img_hsv = cv.cvtColor(image, cv.COLOR_BGR2HSV)
-    mask = cv.inRange(img_hsv,(90,100,150),(140,255,255))
+    mask = cv.inRange(img_hsv,(90,100,50),(140,255,255))
     cropped = cv.bitwise_and(image, image, mask = mask)
     return cropped
     
 def show_green(image):
     img_hsv = cv.cvtColor(image, cv.COLOR_BGR2HSV)
-    mask = cv.inRange(img_hsv,(40,100,140),(80,255,255))
+    mask = cv.inRange(img_hsv,(40,100,180),(80,255,255))
     cropped = cv.bitwise_and(image, image, mask = mask)
     return cropped
 
 def find_circle(image):
     img = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-    circles = cv.HoughCircles(img, cv.HOUGH_GRADIENT, 2, 100, param1 = 100, param2 = 100, minRadius = 0, maxRadius = 500) # change param2
+    circles = cv.HoughCircles(img, cv.HOUGH_GRADIENT, 5, 100, param1 = 800, param2 = 130, minRadius = 10, maxRadius = 400) # change param2
     return circles    
 
 def mask_red(image):
     img_hsv = cv.cvtColor(image, cv.COLOR_BGR2HSV)
-    mask1 = cv.inRange(img_hsv,(0,150,150),(15,255,255))
-    mask2 = cv.inRange(img_hsv,(165,150,150), (180,255,255))
+    mask1 = cv.inRange(img_hsv,(0,150,130),(15,255,255))
+    mask2 = cv.inRange(img_hsv,(165,150,130), (180,255,255))
     mask = cv.bitwise_or(mask1, mask2)
     return mask
 
 def mask_blue(image):
     img_hsv = cv.cvtColor(image, cv.COLOR_BGR2HSV)
-    mask = cv.inRange(img_hsv,(90,100,150),(140,255,255))
+    mask = cv.inRange(img_hsv,(90,100,50),(140,255,255))
     return mask
     
 def mask_green(image):
     img_hsv = cv.cvtColor(image, cv.COLOR_BGR2HSV)
-    mask = cv.inRange(img_hsv,(40,100,140),(80,255,255))
+    mask = cv.inRange(img_hsv,(40,100,180),(80,255,255))
     return mask
 
 def mask_color(image, color):
@@ -154,7 +154,10 @@ def direct(mask, threshold = 50, size = 2500):
     sumup = 0
     for y in range(mask.shape[0]):
         sumup += np.dot(mask[y].astype("float64"), weighted)
-    final = sumup / total
+    try:
+        final = sumup / total
+    except:
+        final = 0
     target = False
     direction = "straight"
     if final < -threshold:

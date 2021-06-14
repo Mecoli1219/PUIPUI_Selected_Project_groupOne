@@ -12,9 +12,9 @@ import RPi.GPIO as GPIO
 
 def main():
     camera = PiCamera()
-    camera.resolution = (1920, 1080)
+    camera.resolution = (512, 512)
     camera.framerate = 32
-    rawCapture = PiRGBArray(camera, size=(1920, 1080))
+    rawCapture = PiRGBArray(camera, size=(512, 512))
     color_dict = {"red": 1, "blue": 1, "green": 1}
 
     GPIO.setmode(GPIO.BCM)
@@ -24,7 +24,7 @@ def main():
     GPIO.setup(ECHO, GPIO.IN)
     GPIO.output(TRIG, False)
     time.sleep(2)
-    catch_distance = 3  # cm
+    catch_distance = 12  # cm
     sound_speed = 17150
 
     if (sys.argv[1] == '0'):
@@ -40,8 +40,7 @@ def main():
             image = pic.take_pic(camera, rawCapture, 0.1)
             if not lock_target:
                 print("find target")
-                next_color, direction, lock_target = pic.detect_object(
-                    image, color_dict, 20, 2500)
+                next_color, direction, lock_target = pic.detect_object(image, color_dict, 20, 2500)
                 print("Sent command: %s" % direction)
                 command = "{}\n".format(direction)
                 ser.write(command.encode())
@@ -86,13 +85,19 @@ def main():
                     ser.write(command.encode())
 
     elif (sys.argv[1] == '1'):
-        test = cv.imread("./src/test.jpg")
-        print(test.shape)
-        next_color, direction, target = pic.detect_object(
-            test, color_dict, 20, 2500)
-        print(next_color, direction, target)
-        cv.imshow("circle", test)
-        cv.waitKey()
+        while True:
+            image = pic.take_pic(camera, rawCapture, 0.1)
+            circles = (pic.find_circle(pic.show_blue(image[:,:,::-1])))
+            img = pic.show_blue(image[:,:,::-1])
+            print(circles)
+            canny = cv.Canny(img, 400, 800)
+            if circles is not None:
+                for circle in circles[0,:]:
+                    cv.circle(img, (circle[0], circle[1]),int(circle[2]),(0,255,0),2)
+            cv.imshow("initial", image[:,:,::-1])
+            cv.imshow("image", img)
+            cv.imshow("canny", canny)
+            cv.waitKey(1)
 
 
 if __name__ == '__main__':
