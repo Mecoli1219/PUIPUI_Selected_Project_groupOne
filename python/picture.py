@@ -16,8 +16,8 @@ def take_pic(camera, rawCapture, Time = 1):
 
 def show_red(image):
     img_hsv = cv.cvtColor(image, cv.COLOR_BGR2HSV)
-    mask1 = cv.inRange(img_hsv,(0,150,130),(15,255,255))
-    mask2 = cv.inRange(img_hsv,(165,150,130), (180,255,255))
+    mask1 = cv.inRange(img_hsv,(0,150,100),(15,255,255))
+    mask2 = cv.inRange(img_hsv,(165,150,100), (180,255,255))
     mask = cv.bitwise_or(mask1, mask2)
     cropped = cv.bitwise_and(image, image, mask = mask)
     return cropped
@@ -36,19 +36,19 @@ def show_green(image):
 
 def find_circle(image, color):
     if color == "red":
-        parameter2 = 100
+        parameter2 = 70
     if color == "blue":
-        parameter2 = 120
+        parameter2 = 70
     if color == "green":
-        parameter2 = 110
+        parameter2 = 70
     img = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-    circles = cv.HoughCircles(img, cv.HOUGH_GRADIENT, 5, 100, param1 = 800, param2 = parameter2, minRadius = 10, maxRadius = 400) # change param2
+    circles = cv.HoughCircles(img, cv.HOUGH_GRADIENT, 3, 100, param1 = 100, param2 = parameter2, minRadius = 10, maxRadius = 400) # change param2
     return circles    
 
 def mask_red(image):
     img_hsv = cv.cvtColor(image, cv.COLOR_BGR2HSV)
-    mask1 = cv.inRange(img_hsv,(0,150,130),(15,255,255))
-    mask2 = cv.inRange(img_hsv,(165,150,130), (180,255,255))
+    mask1 = cv.inRange(img_hsv,(0,150,100),(15,255,255))
+    mask2 = cv.inRange(img_hsv,(165,150,100), (180,255,255))
     mask = cv.bitwise_or(mask1, mask2)
     return mask
 
@@ -99,6 +99,7 @@ def find_color_circle(image, color):
     try:
         for circle in circles[0]:    
             mask = circle_mask(image, circle)
+            print("hi")
             '''
             mask = np.zeros(image.shape[:2], np.uint8)
             x1,x2,y1,y2 = rec_out_circle(circle,image)
@@ -165,9 +166,9 @@ def direct(mask, threshold = 50, size = 2500):
     sumup = 0
     for y in range(mask.shape[0]):
         sumup += np.dot(mask[y].astype("float64"), weighted)
-    try:
+    if total != 0:
         final = sumup / total
-    except:
+    else:
         final = 0
     target = False
     direction = "straight"

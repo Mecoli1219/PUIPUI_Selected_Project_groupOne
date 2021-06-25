@@ -24,7 +24,7 @@ def main():
     GPIO.setup(ECHO, GPIO.IN)
     GPIO.output(TRIG, False)
     time.sleep(2)
-    catch_distance = 10  # cm
+    catch_distance = 12  # cm
     sound_speed = 17150
 
     if (sys.argv[1] == '0'):
@@ -40,13 +40,13 @@ def main():
             image = pic.take_pic(camera, rawCapture, 0.1)
             if not lock_target:
                 print("find target")
-                next_color, direction, lock_target = pic.detect_object(image, color_dict, 20, 1000)
+                next_color, direction, lock_target = pic.detect_object(image, color_dict, 20, 2500)
                 print("Sent command: %s" % direction)
                 command = "{}\n".format(direction)
                 ser.write(command.encode())
             elif lock_target and not get_target:
                 print("track target: %s" % next_color)
-                direction = pic.track_object(image, next_color, 10)
+                direction = pic.track_object(image, next_color, 100)
                 print("Sent command: %s" % direction)
                 command = "{}\n".format(direction)
                 ser.write(command.encode())
@@ -112,7 +112,7 @@ def main():
                     cv.circle(img, (circle[0], circle[1]),int(circle[2]),(0,255,0),2)
             #cv.imshow("initial", image[:,:,::-1])
             cv.imshow("image", img)
-            cv.imshow("canny", canny)
+            #cv.imshow("canny", canny)
             cv.waitKey(1)
 
     elif (sys.argv[1] == '2'):
