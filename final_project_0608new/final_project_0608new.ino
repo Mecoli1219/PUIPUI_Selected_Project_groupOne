@@ -62,9 +62,11 @@ void loop() {
       }
       else if(data == catch_s){
         catchbox();
+        Serial.println("m");
       }
       else if(data == drop_s){
         drop();
+        Serial.println("m");
       }
     }
 /*

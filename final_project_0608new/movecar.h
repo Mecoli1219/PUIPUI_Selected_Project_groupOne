@@ -16,6 +16,11 @@ void move_forward(double vL, double vR){
   digitalWrite(MotorR_I4, LOW);
   analogWrite(MotorL_PWML,vL);
   analogWrite(MotorR_PWMR,vR);
+  delay(100);
+  digitalWrite(MotorL_PWML, LOW);
+  digitalWrite(MotorR_PWMR, LOW);
+  
+  
 }
 
 void move_backward(double vL, double vR){
@@ -25,6 +30,9 @@ void move_backward(double vL, double vR){
   digitalWrite(MotorR_I3, LOW);
   analogWrite(MotorL_PWML,vL);
   analogWrite(MotorR_PWMR,vR);
+  delay(100);
+  digitalWrite(MotorL_PWML, LOW);
+  digitalWrite(MotorR_PWMR, LOW);  
 }
 
 void turn_left(double vL, double vR){
@@ -33,7 +41,10 @@ void turn_left(double vL, double vR){
   digitalWrite(MotorR_I3, HIGH);
   digitalWrite(MotorR_I4, LOW);
   analogWrite(MotorL_PWML,vL);
-  analogWrite(MotorR_PWMR,vR);  
+  analogWrite(MotorR_PWMR,vR);
+  delay(100);
+  digitalWrite(MotorL_PWML, LOW);
+  digitalWrite(MotorR_PWMR, LOW);    
 }
 
 void turn_right(double vL, double vR){
@@ -42,7 +53,10 @@ void turn_right(double vL, double vR){
   digitalWrite(MotorR_I4, HIGH);
   digitalWrite(MotorR_I3, LOW);
   analogWrite(MotorL_PWML,vL);
-  analogWrite(MotorR_PWMR,vR);  
+  analogWrite(MotorR_PWMR,vR);
+  delay(100);
+  digitalWrite(MotorL_PWML, LOW);
+  digitalWrite(MotorR_PWMR, LOW);    
 }
 
 void catchbox(){
@@ -52,6 +66,7 @@ void catchbox(){
 void drop(){
   myservo.write(60);
   delay(2000);
+
 }
 
 
