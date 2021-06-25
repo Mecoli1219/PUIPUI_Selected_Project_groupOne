@@ -21,7 +21,7 @@ Servo myservo;
 
 void setup() {
 
-
+  Serial.begin(9600);
   //L298N pin
   pinMode(MotorL_I1, OUTPUT);
   pinMode(MotorL_I2, OUTPUT);
@@ -48,7 +48,11 @@ void loop() {
       //Serial.println(data);
       
       if(data == straight_s){
-        move_forward(200,200);              
+        move_forward(200,200); 
+        /*digitalWrite(13,HIGH);
+        delay(500);
+        digitalWrite(13,LOW);  
+        delay(500);*/           
       }
       else if(data == left_s){
         turn_left(200,200);
