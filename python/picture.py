@@ -36,13 +36,13 @@ def show_green(image):
 
 def find_circle(image, color):
     if color == "red":
-        parameter2 = 70
+        parameter2 = 30
     if color == "blue":
-        parameter2 = 70
+        parameter2 = 100
     if color == "green":
-        parameter2 = 70
+        parameter2 = 100
     img = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-    circles = cv.HoughCircles(img, cv.HOUGH_GRADIENT, 3, 100, param1 = 100, param2 = parameter2, minRadius = 10, maxRadius = 400) # change param2
+    circles = cv.HoughCircles(img, cv.HOUGH_GRADIENT, 3, 100, param1 = 800, param2 = parameter2, minRadius = 10, maxRadius = 400) # change param2
     return circles    
 
 def mask_red(image):
@@ -71,11 +71,13 @@ def mask_color(image, color):
         return mask_green(image)
 
 def circle_mask(image, circle):
-    mask = np.zeros(image.shape[:2], np.uint8)
-    for x in range(image.shape[0]):
-        for y in range(image.shape[1]):
-            if (x-circle[0])**2 + (y-circle[1])**2 - circle[2]**2 <= 0:
-                mask[y][x] = 255
+    x = image.shape[0]
+    y = image.shape[1]
+    xx, yy = np.mgrid[:x, :y]
+    distant = (xx - circle[0]) ** 2 + (yy - circle[1]) ** 2
+    bool_mask = distant <= (circle[2] ** 2)
+    mask = bool_mask.astype(np.uint8) 
+    mask *= 255
     return mask
 
 

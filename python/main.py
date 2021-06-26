@@ -110,9 +110,9 @@ def main():
             if circles is not None:
                 for circle in circles[0,:]:
                     cv.circle(img, (circle[0], circle[1]),int(circle[2]),(0,255,0),2)
-            #cv.imshow("initial", image[:,:,::-1])
+            cv.imshow("initial", image[:,:,::-1])
             cv.imshow("image", img)
-            cv.imshow("canny", canny)
+           # cv.imshow("canny", canny)
             cv.waitKey(1)
 
     elif (sys.argv[1] == '2'):
