@@ -40,7 +40,8 @@ def main():
             image = pic.take_pic(camera, rawCapture, 0.1)
             if not lock_target:
                 print("find target")
-                next_color, direction, lock_target = pic.detect_object(image, color_dict, 10, 500)
+                next_color, direction, lock_target = pic.detect_object(
+                    image, color_dict, 10, 500)
                 print("Sent command: %s" % direction)
                 command = "{}\n".format(direction)
                 ser.write(command.encode())
@@ -103,20 +104,22 @@ def main():
     elif (sys.argv[1] == '1'):
         while True:
             image = pic.take_pic(camera, rawCapture, 0.1)
-            circles = (pic.find_circle(pic.show_red(image[:,:,::-1]),"red"))
-            img = pic.show_red(image[:,:,::-1])
-            test = (image[:,:,::-1])
+            circles = (pic.find_circle(pic.show_red(image[:, :, ::-1]), "red"))
+            img = pic.show_red(image[:, :, ::-1])
+            test = (image[:, :, ::-1])
             print(circles)
             canny = cv.Canny(img, 400, 800)
             if circles is not None:
-                for circle in circles[0,:]:
-                    cv.circle(img, (circle[0], circle[1]),int(circle[2]),(0,255,0),2)
-            circle = pic.find_red_circle(image[:,:,::-1])
+                for circle in circles[0, :]:
+                    cv.circle(img, (circle[0], circle[1]),
+                              int(circle[2]), (0, 255, 0), 2)
+            circle = pic.find_red_circle(image[:, :, ::-1])
             print(circle)
             if circle is not None:
                 mask = pic.circle_mask(test, circle)
-                test = cv.bitwise_and(test,test, mask = mask)
-                cv.circle(img, (circle[0], circle[1]),int(circle[2]),(255,255,0),2)
+                test = cv.bitwise_and(test, test, mask=mask)
+                cv.circle(img, (circle[0], circle[1]),
+                          int(circle[2]), (255, 255, 0), 2)
             #cv.imshow("initial", image[:,:,::-1])
             cv.imshow("image", img)
             cv.imshow("test", test)
@@ -136,7 +139,8 @@ def main():
             image = pic.take_pic(camera, rawCapture, 0.1)
             if not lock_target:
                 print("find target")
-                next_color, direction, lock_target = pic.detect_object(image, color_dict, 20, 2500)
+                next_color, direction, lock_target = pic.detect_object(
+                    image, color_dict, 20, 2500)
                 print("Sent command: %s" % direction)
                 command = "{}\n".format(direction)
                 ser.write(command.encode())
@@ -179,7 +183,6 @@ def main():
                     print("Sent command: %s" % direction)
                     command = "{}\n".format(direction)
                     ser.write(command.encode())
-
 
 
 if __name__ == '__main__':
