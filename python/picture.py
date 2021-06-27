@@ -10,7 +10,7 @@ def take_pic(camera, rawCapture, Time=1):
     camera.capture(rawCapture, format="bgr")
     image = rawCapture.array
     rawCapture.truncate(0)
-    return image[:, :, ::-1]
+    return image
 
 
 def show_red(image):
@@ -153,7 +153,6 @@ def find_red_circle(image):
                 return circle
         return None
     except:
-        print("err")
         return None
 
 
@@ -187,7 +186,7 @@ def find_green_circle(image):
         return None
 
 
-def direct(mask, threshold=50, size=2500):
+def direct(mask, threshold, size):
     total = mask.sum() / 255
     half_len = mask.shape[1] // 2
     weighted = np.arange(-half_len,
@@ -198,7 +197,8 @@ def direct(mask, threshold=50, size=2500):
     if total != 0:
         final = sumup / total
     else:
-        final = 100
+        final = 300
+    print(final)
     target = False
     direction = "straight"
     if final < -threshold:
@@ -210,7 +210,7 @@ def direct(mask, threshold=50, size=2500):
     return direction, target
 
 
-def detect_object(image, color_dict, threshold=50, size=2500):
+def detect_object(image, color_dict, threshold, size):
     circle = list()
     circle.append(find_red_circle(image))
     circle.append(find_blue_circle(image))
@@ -219,9 +219,11 @@ def detect_object(image, color_dict, threshold=50, size=2500):
     masked = image
     for index in range(3):
         if circle[index] is not None:
-            mask = block_circle(circle[index], image)
+            mask = block_circle(image, circle[index])
             masked = cv.bitwise_and(masked, masked, mask=mask)
+    print(mask.sum() /255)
     red_mask = mask_red(masked)
+    print(red_mask.sum() / 255)
     blue_mask = mask_blue(masked)
     green_mask = mask_green(masked)
     if color_dict["blue"] > 0:
@@ -257,7 +259,7 @@ def detect_object(image, color_dict, threshold=50, size=2500):
     return None, "right", False
 
 
-def track_object(image, color, threshold=50):
+def track_object(image, color, threshold):
     circle = find_color_circle(image, color)
     mask = 255 * np.ones(image.shape[:2], np.uint8)
     masked = image
@@ -270,10 +272,15 @@ def track_object(image, color, threshold=50):
     return direction
 
 
-def detect_storage(image, color, threshold=20, radius=100):
-    circle = find_color_circle(image, color)
-    print("circle")
+def detect_storage(image, color, threshold, radius=100):
+    if color == "red":
+        circle = find_red_circle(image)
+    if color == "blue":
+        circle = find_blue_circle(image)
+    if color == "green":
+        circle = find_green_circle(image)
     half_len = image.shape[1] // 2
+    print(circle)
     if circle is not None:
         arrive = False
         if circle[0] - half_len > threshold:

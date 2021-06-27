@@ -17,6 +17,8 @@ def main():
     rawCapture = PiRGBArray(camera, size=(512, 512))
     color_dict = {"red": 1, "blue": 0, "green": 1}
 
+    storage_mask = np.zeros((512,512), np.uint8)
+    storage_mask[:360,:] = 255
     GPIO.setmode(GPIO.BCM)
     TRIG = 23
     ECHO = 24
@@ -41,13 +43,13 @@ def main():
             if not lock_target:
                 print("find target")
                 next_color, direction, lock_target = pic.detect_object(
-                    image, color_dict, 10, 500)
+                    image, color_dict, 200, 10000)
                 print("Sent command: %s" % direction)
                 command = "{}\n".format(direction)
                 ser.write(command.encode())
             elif lock_target and not get_target:
                 print("track target: %s" % next_color)
-                direction = pic.track_object(image, next_color, 10)
+                direction = pic.track_object(image, next_color, 30)
                 print("Sent command: %s" % direction)
                 command = "{}\n".format(direction)
                 ser.write(command.encode())
@@ -76,11 +78,13 @@ def main():
                                 print(rv)
                                 ser.flushInput()
                                 break
+                        ser.flush()
                         get_target = True
             elif get_target:
                 print("find storage")
+                image = cv.bitwise_and(image,image, mask = storage_mask)
                 direction, arrive = pic.detect_storage(
-                    image, next_color, 20, 100)
+                    image, next_color, 80, 120)
                 if arrive:
                     print("Sent command: drop")
                     while True:
@@ -92,6 +96,7 @@ def main():
                             print(rv)
                             ser.flushInput()
                             break
+                    ser.flush()
                     color_dict[next_color] -= 1
                     get_target = False
                     lock_target = False
@@ -104,25 +109,29 @@ def main():
     elif (sys.argv[1] == '1'):
         while True:
             image = pic.take_pic(camera, rawCapture, 0.1)
-            circles = (pic.find_circle(pic.show_red(image[:, :, ::-1]), "red"))
-            img = pic.show_red(image[:, :, ::-1])
-            test = (image[:, :, ::-1])
+            image = cv.bitwise_and(image,image, mask = storage_mask)
+            circles = (pic.find_circle(pic.show_red(image), "red"))
+            img = pic.show_red(image)
+            red_mask = pic.mask_red(image)
+            test = (image)
             print(circles)
             canny = cv.Canny(img, 400, 800)
             if circles is not None:
                 for circle in circles[0, :]:
                     cv.circle(img, (circle[0], circle[1]),
                               int(circle[2]), (0, 255, 0), 2)
-            circle = pic.find_red_circle(image[:, :, ::-1])
+            circle = pic.find_red_circle(image)
             print(circle)
             if circle is not None:
                 mask = pic.circle_mask(test, circle)
                 test = cv.bitwise_and(test, test, mask=mask)
                 cv.circle(img, (circle[0], circle[1]),
                           int(circle[2]), (255, 255, 0), 2)
-            #cv.imshow("initial", image[:,:,::-1])
-            cv.imshow("image", img)
+            red = cv.bitwise_and(image,image, mask = red_mask)
+            cv.imshow("initial", image)
+            #cv.imshow("image", img)
             cv.imshow("test", test)
+            #cv.imshow("red", red)
            # cv.imshow("canny", canny)
             cv.waitKey(1)
 
