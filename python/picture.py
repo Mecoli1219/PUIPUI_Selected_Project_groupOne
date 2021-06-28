@@ -205,6 +205,8 @@ def direct(mask, threshold, size):
         direction = "left"
     if final > threshold:
         direction = "right"
+    if final == 300:
+        direction = "right_more"
     if total > size:
         target = True
     return direction, target
@@ -256,7 +258,7 @@ def detect_object(image, color_dict, threshold, size):
         if target:
             next_color = "green"
         return next_color, direction, target
-    return None, "right", False
+    return None, "right_more", False
 
 
 def track_object(image, color, threshold):
@@ -292,4 +294,4 @@ def detect_storage(image, color, threshold, radius=100):
             if circle[2] >= radius:
                 arrive = True
         return direction, arrive
-    return "right", False
+    return "right_more", False

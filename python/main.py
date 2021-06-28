@@ -16,7 +16,9 @@ def main():
     camera.framerate = 32
     rawCapture = PiRGBArray(camera, size=(512, 512))
     color_dict = {"red": 1, "blue": 0, "green": 1}
-
+    
+    object_mask = np.zeros((512,512), np.uint8)
+    object_mask[350:,:] = 255
     storage_mask = np.zeros((512,512), np.uint8)
     storage_mask[:360,:] = 255
     GPIO.setmode(GPIO.BCM)
@@ -42,13 +44,15 @@ def main():
             image = pic.take_pic(camera, rawCapture, 0.1)
             if not lock_target:
                 print("find target")
+                image = cv.bitwise_and(image,image,mask = object_mask)
                 next_color, direction, lock_target = pic.detect_object(
-                    image, color_dict, 200, 10000)
+                    image, color_dict, 100, 10000)
                 print("Sent command: %s" % direction)
                 command = "{}\n".format(direction)
                 ser.write(command.encode())
             elif lock_target and not get_target:
                 print("track target: %s" % next_color)
+                image = cv.bitwise_and(image,image,mask = object_mask)
                 direction = pic.track_object(image, next_color, 30)
                 print("Sent command: %s" % direction)
                 command = "{}\n".format(direction)
