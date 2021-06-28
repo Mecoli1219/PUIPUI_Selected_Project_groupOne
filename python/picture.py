@@ -220,14 +220,16 @@ def detect_object(image, color_dict, threshold, size):
     mask = 255 * np.ones(image.shape[:2], np.uint8)
     masked = image
     for index in range(3):
-        if circle[index] is not None:
+        if circle[index] is not None and circle[index][1] <= 400:
             mask = block_circle(image, circle[index])
             masked = cv.bitwise_and(masked, masked, mask=mask)
-    print(mask.sum() /255)
+    print(circle)
+    print(masked.sum() /255)
     red_mask = mask_red(masked)
-    print(red_mask.sum() / 255)
     blue_mask = mask_blue(masked)
     green_mask = mask_green(masked)
+    print(red_mask.sum() / 255)
+    print(green_mask.sum() / 255)
     if color_dict["blue"] > 0:
         blue_num = blue_mask.sum() // 255
     else:
@@ -274,7 +276,7 @@ def track_object(image, color, threshold):
     return direction
 
 
-def detect_storage(image, color, threshold, radius=100):
+def detect_storage_old(image, color, threshold, radius=100):
     if color == "red":
         circle = find_red_circle(image)
     if color == "blue":
@@ -294,4 +296,20 @@ def detect_storage(image, color, threshold, radius=100):
             if circle[2] >= radius:
                 arrive = True
         return direction, arrive
-    return "right_more", False
+    mask = mask_color(image, color)
+    if mask.sum() / 255 < 10:
+        return "right_more", False
+    else:
+        return "right", False
+
+
+def detect_storage(image, color, threshold, radius=100):
+    mask = mask_color(image, color)
+    direction, target = direct(mask, threshold, 0)
+    print(mask.sum()/255)
+    if mask.sum() / 255 >= np.pi * radius **2:
+        return direction, True
+    elif mask.sum() / 255 <= 100:
+        return "right_more", False
+    else:
+        return direction, False
