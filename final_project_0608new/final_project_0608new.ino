@@ -31,6 +31,10 @@ void setup() {
   pinMode(MotorR_PWMR, OUTPUT);
   myservo.attach(Servo_signal);
   myservo.write(60);
+  delay(500);
+  myservo.write(0);
+  delay(500);
+  myservo.write(60);
 #ifdef DEBUG
   Serial.println("Start!");
 #endif
@@ -55,17 +59,19 @@ void loop() {
         delay(500);*/           
       }
       else if(data == left_s){
-        turn_left(200,200);
+        turn_left(150,150);
       }
       else if(data == right_s){
-        turn_right(200,200);
+        turn_right(150,150);
       }
       else if(data == catch_s){
         catchbox();
         Serial.println("m");
       }
       else if(data == drop_s){
-        drop();
+        drop();    
+        move_backward_new(200,200);
+        //turn_right_new(200,200);
         Serial.println("m");
       }
     }
