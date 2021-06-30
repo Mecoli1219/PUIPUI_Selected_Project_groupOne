@@ -42,7 +42,7 @@ void move_backward_new(double vL, double vR){
   digitalWrite(MotorR_I3, LOW);
   analogWrite(MotorL_PWML,vL);
   analogWrite(MotorR_PWMR,vR);
-  delay(200);
+  delay(350);
 
 }
 

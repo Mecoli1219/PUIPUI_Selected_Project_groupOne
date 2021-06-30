@@ -16,7 +16,7 @@ String left_s = "left";
 String right_s = "right";
 String catch_s = "catch";
 String drop_s = "drop";
-
+String right_m = "right_more";
 Servo myservo;
 
 void setup() {
@@ -59,10 +59,10 @@ void loop() {
         delay(500);*/           
       }
       else if(data == left_s){
-        turn_left(150,150);
+        turn_left(130,130);
       }
       else if(data == right_s){
-        turn_right(150,150);
+        turn_right(130,130);
       }
       else if(data == catch_s){
         catchbox();
@@ -73,6 +73,10 @@ void loop() {
         move_backward_new(200,200);
         //turn_right_new(200,200);
         Serial.println("m");
+      }
+      else if(data == right_m){
+        delay(50);
+        turn_right(255,255);  
       }
     }
 /*
